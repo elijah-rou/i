@@ -21,6 +21,8 @@
 #> Script-secific libraries ----
 
 # Here is where we load libraries
+
+install.packages("lubridate")
 library(lubridate)
 library(tidyverse)
 
@@ -28,16 +30,30 @@ library(tidyverse)
 # LOAD DATA ====
 
 df <- read.csv("data/raw/teaching_training_data.csv")
+#include the path within the project
 
 # Notice the path (it is machine independent)
 
 # Look at the data - what do we see?
+#83270 rows and 23 columns
+#unid: unique id
+#rows 5 and 6 same person, interviewed at different times
 
+table(df$gender)
+
+<<<<<<< HEAD
 ## Grab distinct individuals from the data frame
 unique_individuals <- df %>%
     distinct(unid, gender)
 
 
+=======
+unique_individuals <- df %>% distinct(unid,gender)
+#purpose of putting in gender is to count the number of females and males
+unique_individuals2 <- df %>% distinct(unid,gender,.keep_all=TRUE)
+#add .keep_all=TRUE to leave in the rest of the variables
+table(unique_individuals$gender)
+>>>>>>> master
 
 # WRANGLING & FEATURE ENGINEERING ====
 
@@ -49,6 +65,12 @@ unique_individuals <- df %>%
 # View data
 
 view(df)
+
+table(df$gender)
+unique_individual <- df %>% 
+  distinct(unid,gender)
+
+table(unique_individual$gender)
 
 
 # Start with communication score
@@ -85,6 +107,11 @@ ggplot(data = df) +
 df <- df %>% 
   mutate(age_at_survey = interval(dob, survey_date_month)/years(1)) %>% 
   mutate(age = floor(age_at_survey))
+#floor is to round down
+
+#!!!!!!! Filters out duplicates, keeping the most recent version !!!!!!!!!!!!
+
+df_unique <- df[!rev(duplicated(rev(df$unid))),]
 
 # see lubridate link (https://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html)
 
@@ -103,8 +130,11 @@ ggplot(data = df) +
 # A different approach
 
 ggplot(data = df) + 
+  geom_density(mapping = aes(x = age, fill = gender),adjust=1.2, alpha = 0.3)
+#k density --> 20 and 21, no observations in between which causes the dip
+#adjust to smoothen the line
+ggplot(data = df) + 
   geom_density(mapping = aes(x = age_at_survey, fill = gender), alpha = 0.3)
-
 # NAs and older people cloud our view
 
 # tidyverse::filter
@@ -116,6 +146,7 @@ ggplot(data = df_without_gender_NAs) +
   xlim(15, 35)
 
 
+df_without_gender_NAs <- df[!is.na(df$gender),]
 # group_by
 # we might want to count the number of surveys people have done
 
@@ -124,7 +155,15 @@ df <- df %>%
   mutate(total_surveys = max(survey_num)) %>% 
   ungroup()
 
+df_unid <- df %>% 
+  group_by(unid) %>% 
+  summarise(total_surveys = max(survey_num)) %>% 
+  ungroup()
+
 # Always good practise to ungroup() since later you might forget that you have grouped and operations willbe affected by it
+
+
+
 
 
 
