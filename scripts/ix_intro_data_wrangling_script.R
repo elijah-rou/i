@@ -22,7 +22,6 @@
 
 # Here is where we load libraries
 
-install.packages("lubridate")
 library(lubridate)
 library(tidyverse)
 
@@ -106,9 +105,6 @@ df <- df %>%
   mutate(age = floor(age_at_survey))
 #floor is to round down
 
-#!!!!!!! Filters out duplicates, keeping the most recent version !!!!!!!!!!!!
-
-df_unique <- df[!rev(duplicated(rev(df$unid))),]
 
 # see lubridate link (https://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html)
 
@@ -158,11 +154,6 @@ df_unid <- df %>%
   ungroup()
 
 # Always good practise to ungroup() since later you might forget that you have grouped and operations willbe affected by it
-
-
-
-
-
 
 # create other data frames to create descriptive stats (and other things)
 
