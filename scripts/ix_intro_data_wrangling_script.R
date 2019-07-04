@@ -41,19 +41,16 @@ df <- read.csv("data/raw/teaching_training_data.csv")
 
 table(df$gender)
 
-<<<<<<< HEAD
 ## Grab distinct individuals from the data frame
 unique_individuals <- df %>%
     distinct(unid, gender)
 
+## Leave rest of vars untouched
+unique_individuals2 <- df %>% 
+    distinct(unid,gender,.keep_all=TRUE)
 
-=======
-unique_individuals <- df %>% distinct(unid,gender)
-#purpose of putting in gender is to count the number of females and males
-unique_individuals2 <- df %>% distinct(unid,gender,.keep_all=TRUE)
-#add .keep_all=TRUE to leave in the rest of the variables
+## Create table
 table(unique_individuals$gender)
->>>>>>> master
 
 # WRANGLING & FEATURE ENGINEERING ====
 
