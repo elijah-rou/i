@@ -30,11 +30,27 @@ library(tidyverse)
 # LOAD DATA ====
 
 df <- read.csv("data/raw/teaching_training_data.csv")
+#include the path within the project
 
 # Notice the path (it is machine independent)
 
 # Look at the data - what do we see?
+#83270 rows and 23 columns
+#unid: unique id
+#rows 5 and 6 same person, interviewed at different times
 
+table(df$gender)
+
+## Grab distinct individuals from the data frame
+unique_individuals <- df %>%
+    distinct(unid, gender)
+
+## Leave rest of vars untouched
+unique_individuals2 <- df %>% 
+    distinct(unid,gender,.keep_all=TRUE)
+
+## Create table
+table(unique_individuals$gender)
 
 # WRANGLING & FEATURE ENGINEERING ====
 
@@ -88,6 +104,7 @@ ggplot(data = df) +
 df <- df %>% 
   mutate(age_at_survey = interval(dob, survey_date_month)/years(1)) %>% 
   mutate(age = floor(age_at_survey))
+#floor is to round down
 
 #!!!!!!! Filters out duplicates, keeping the most recent version !!!!!!!!!!!!
 
@@ -110,8 +127,11 @@ ggplot(data = df) +
 # A different approach
 
 ggplot(data = df) + 
-  geom_density(mapping = aes(x = age, fill = gender), alpha = 0.3)
-
+  geom_density(mapping = aes(x = age, fill = gender),adjust=1.2, alpha = 0.3)
+#k density --> 20 and 21, no observations in between which causes the dip
+#adjust to smoothen the line
+ggplot(data = df) + 
+  geom_density(mapping = aes(x = age_at_survey, fill = gender), alpha = 0.3)
 # NAs and older people cloud our view
 
 # tidyverse::filter
