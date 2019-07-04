@@ -21,6 +21,8 @@
 #> Script-secific libraries ----
 
 # Here is where we load libraries
+
+install.packages("lubridate")
 library(lubridate)
 library(tidyverse)
 
@@ -44,6 +46,12 @@ df <- read.csv("data/raw/teaching_training_data.csv")
 # View data
 
 view(df)
+
+table(df$gender)
+unique_individual <- df %>% 
+  distinct(unid,gender)
+
+table(unique_individual$gender)
 
 
 # Start with communication score
@@ -81,6 +89,10 @@ df <- df %>%
   mutate(age_at_survey = interval(dob, survey_date_month)/years(1)) %>% 
   mutate(age = floor(age_at_survey))
 
+#!!!!!!! Filters out duplicates, keeping the most recent version !!!!!!!!!!!!
+
+df_unique <- df[!rev(duplicated(rev(df$unid))),]
+
 # see lubridate link (https://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html)
 
 
@@ -111,6 +123,7 @@ ggplot(data = df_without_gender_NAs) +
   xlim(15, 35)
 
 
+df_without_gender_NAs <- df[!is.na(df$gender),]
 # group_by
 # we might want to count the number of surveys people have done
 
@@ -119,7 +132,15 @@ df <- df %>%
   mutate(total_surveys = max(survey_num)) %>% 
   ungroup()
 
+df_unid <- df %>% 
+  group_by(unid) %>% 
+  summarise(total_surveys = max(survey_num)) %>% 
+  ungroup()
+
 # Always good practise to ungroup() since later you might forget that you have grouped and operations willbe affected by it
+
+
+
 
 
 
