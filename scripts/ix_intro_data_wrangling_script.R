@@ -28,11 +28,22 @@ library(tidyverse)
 # LOAD DATA ====
 
 df <- read.csv("data/raw/teaching_training_data.csv")
+#include the path within the project
 
 # Notice the path (it is machine independent)
 
 # Look at the data - what do we see?
+#83270 rows and 23 columns
+#unid: unique id
+#rows 5 and 6 same person, interviewed at different times
 
+table(df$gender)
+
+unique_individuals <- df %>% distinct(unid,gender)
+#purpose of putting in gender is to count the number of females and males
+unique_individuals2 <- df %>% distinct(unid,gender,.keep_all=TRUE)
+#add .keep_all=TRUE to leave in the rest of the variables
+table(unique_individuals$gender)
 
 # WRANGLING & FEATURE ENGINEERING ====
 
@@ -80,6 +91,7 @@ ggplot(data = df) +
 df <- df %>% 
   mutate(age_at_survey = interval(dob, survey_date_month)/years(1)) %>% 
   mutate(age = floor(age_at_survey))
+#floor is to round down
 
 # see lubridate link (https://cran.r-project.org/web/packages/lubridate/vignettes/lubridate.html)
 
@@ -98,8 +110,11 @@ ggplot(data = df) +
 # A different approach
 
 ggplot(data = df) + 
-  geom_density(mapping = aes(x = age, fill = gender), alpha = 0.3)
-
+  geom_density(mapping = aes(x = age, fill = gender),adjust=1.2, alpha = 0.3)
+#k density --> 20 and 21, no observations in between which causes the dip
+#adjust to smoothen the line
+ggplot(data = df) + 
+  geom_density(mapping = aes(x = age_at_survey, fill = gender), alpha = 0.3)
 # NAs and older people cloud our view
 
 # tidyverse::filter
@@ -118,6 +133,8 @@ df <- df %>%
   group_by(unid) %>% 
   mutate(total_surveys = max(survey_num)) %>% 
   ungroup()
+
+df_unid <- df %>% group_by (unid) %>% summarise(total_surveys = max(survey_num))  %>% ungroup()
 
 # Always good practise to ungroup() since later you might forget that you have grouped and operations willbe affected by it
 
