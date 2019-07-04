@@ -33,6 +33,11 @@ df <- read.csv("data/raw/teaching_training_data.csv")
 
 # Look at the data - what do we see?
 
+## Grab distinct individuals from the data frame
+unique_individuals <- df %>%
+    distinct(unid, gender)
+
+
 
 # WRANGLING & FEATURE ENGINEERING ====
 
@@ -98,7 +103,7 @@ ggplot(data = df) +
 # A different approach
 
 ggplot(data = df) + 
-  geom_density(mapping = aes(x = age, fill = gender), alpha = 0.3)
+  geom_density(mapping = aes(x = age_at_survey, fill = gender), alpha = 0.3)
 
 # NAs and older people cloud our view
 
