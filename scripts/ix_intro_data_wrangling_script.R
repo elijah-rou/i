@@ -48,15 +48,8 @@ unique_individuals <- df %>%
 unique_individuals2 <- df %>% 
     distinct(unid,gender,.keep_all=TRUE)
 
-<<<<<<< HEAD
 ## Create table
 table(unique_individuals$gender)
-=======
-table(df$gender)
-
-unique_individuals <- df %>% 
-  distinct(unid, gender)
->>>>>>> 13dd72e042d39c924dc984ad28c8c985b20a5400
 
 # WRANGLING & FEATURE ENGINEERING ====
 
@@ -130,16 +123,11 @@ ggplot(data = df) +
 # A different approach
 
 ggplot(data = df) + 
-<<<<<<< HEAD
   geom_density(mapping = aes(x = age, fill = gender),adjust=1.2, alpha = 0.3)
 #k density --> 20 and 21, no observations in between which causes the dip
 #adjust to smoothen the line
 ggplot(data = df) + 
   geom_density(mapping = aes(x = age_at_survey, fill = gender), alpha = 0.3)
-=======
-  geom_density(mapping = aes(x = age_at_survey, fill = gender), alpha = 0.3)
-
->>>>>>> 13dd72e042d39c924dc984ad28c8c985b20a5400
 # NAs and older people cloud our view
 
 # tidyverse::filter
@@ -164,13 +152,6 @@ df_unid <- df %>%
   group_by(unid) %>% 
   summarise(total_surveys = max(survey_num)) %>% 
   ungroup()
-<<<<<<< HEAD
-=======
-
-
-# Always good practise to ungroup() since later you might forget that you have grouped and operations willbe affected by it
-
->>>>>>> 13dd72e042d39c924dc984ad28c8c985b20a5400
 
 # Always good practise to ungroup() since later you might forget that you have grouped and operations willbe affected by it
 
