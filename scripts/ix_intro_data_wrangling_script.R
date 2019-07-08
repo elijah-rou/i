@@ -141,6 +141,7 @@ ggplot(data = df_without_gender_NAs) +
 
 df_without_gender_NAs <- df[!is.na(df$gender),]
 # group_by
+
 # we might want to count the number of surveys people have done
 
 df <- df %>% 
@@ -163,10 +164,47 @@ df_gender_cft <- df_without_gender_NAs %>%
   summarise(cft_mean = mean(cft_score), nobs = n())
 
 
+df_pay_gender <- df_unique %>% 
+  select(unid, gender, working, monthly_pay)
 
+
+
+
+
+ggplot(data = df_pay_gender) +
+  geom_point(mapping = aes( x = working, y = monthly_pay)) +
+             facet_wrap(~ gender, nrow = 2)
 
 # save your 'featured engineered' data
 
 saveRDS(df, file = "data/processed/processed_data.RDS")
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Linear 
 
