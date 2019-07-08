@@ -8,6 +8,7 @@
 
 library(tidyverse)
 library(pastecs)
+library(lubridate)
 
 # turn off scientific notation
 options(scipen=999)
@@ -27,6 +28,9 @@ df <- df %>%
 
 ggplot(data = df) + 
   geom_bar(mapping = aes(x = fin_situ_now))
+
+ggplot(data = df) + 
+  geom_bar(mapping = aes(x = fin_situ_future))
 
 
 ggplot(data = df) + 
@@ -52,10 +56,11 @@ ggplot(data = df) +
 
 # Now split into testing and training
 
-
+df <- df %>% 
+  mutate(age_at_survey = interval(dob, survey_date_month)/years(1)) %>% 
+  mutate(age = floor(age_at_survey))
 
 # create training data
-
 
 set.seed(1234)
 
@@ -88,8 +93,12 @@ reg2 <- lm(working ~ gender + fin_situ_now + anyhhincome, data = df_train)
 summary(reg2)
 
 # how does below differ?
-reg3 <- lm(working ~ gender + as.factor(fin_situ_now) + anyhhincome, data = df_train)
+#reg3 <- lm(working ~ gender + as.factor(fin_situ_now) + anyhhincome, data = df_train)
 
+#summary(reg3)
+
+
+reg3 <- lm(working ~ gender + company_size + monthly_pay, data=df_train)
 summary(reg3)
 
 # discussion of what this means
