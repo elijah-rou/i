@@ -8,6 +8,7 @@
 
 library(pastecs)
 library(tidyverse)
+install.packages("pastecs")
 
 # turn off scientific notation
 options(scipen=999)
