@@ -15,6 +15,7 @@
 options(scipen=999)
 
 library(tidyverse)
+library(plotly)
 
 # READ IN DATA
 # in time this should point to your 'wrangled'/cleaned data file
@@ -95,6 +96,7 @@ df_cluster <- df_cluster_n %>%
   scale()
 
 # what does this data look like?
+set.seed(1234)
 
 # KMEANS
 k4 <- kmeans(df_cluster, centers = 4, nstart = 25)
@@ -121,6 +123,8 @@ df_cluster_k4_sum <- df_cluster_k4 %>%
             opt_score = mean(opt_score), 
             nobs = n())
 
+# 3D Plot
+# TODO
 
 # HOW MANY CLUSTERS ARE OPTIMAL?
 #Elbow Method for finding the optimal number of clusters
@@ -149,7 +153,7 @@ hc1 <- hclust(d, method = "complete" )
 plot(hc1, cex = 0.6, hang = -1)
 
 # Looks like 3 clusters in dendogram
-clusterCut <- cutree(hc1, 3)
+clusterCut <- cutree(hc1, 5)
 table(clusterCut)
 
 df_cluster_h3 <- bind_cols(as.data.frame(df_cluster), as.data.frame(clusterCut))
