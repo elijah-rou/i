@@ -96,6 +96,7 @@ df_cluster <- df_cluster_n %>%
 
 # what does this data look like?
 
+set.seed(1234)
 # KMEANS
 k4 <- kmeans(df_cluster, centers = 4, nstart = 25)
 
