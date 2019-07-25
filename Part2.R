@@ -1,5 +1,6 @@
 install.packages("tidyverse")
 library(tidyverse)
+library(dplyr)
 df_2 <- read.csv("dataframe2.csv")
 
 # Percentage of individuals employed more than 6 months is 0.067
@@ -98,7 +99,9 @@ predicted <- predict(model_rpart, testData[,-length(testData)])
 model_rpart$results
 
 # Confusion Matrix
-table(predicted, testData$loe_morethan6months)
+results_rpart <- table(predicted, testData$loe_morethan6months)
+library(caret)
+confusionMatrix(results_rpart)
 
 # Section C: Logistic Regression, SVM
 df_3i <- select(df_2, -c(X.1, X, survey_date_month, survey_num, working, job_start_date, job_leave_date, financial_situation_now, financial_situation_5years, age, fin_situ_now, fin_situ_future, com_score, num_score, company_size, monthly_pay, length_of_employment, peoplelive_15plus, province, dob))
@@ -128,31 +131,36 @@ predicted_log=predict(logistic,df_test, type="response")
 predicted_log <- ifelse(predicted_log>0.5,1,0)
 table(predicted_log, df_test$loe_morethan6months)
 
+
 # SVM
 library(e1071)
 fit <- svm(loe_morethan6months ~ gender + age_at_survey + fin_situ_change, data=df_train)
 predicted_svm <- predict(fit, df_test)
-table(predicted_svm, df_test$loe_morethan6months)
+results_SVM <- table(predicted_svm, df_test$loe_morethan6months)
+confusionMatrix(results_SVM)
 
 # Naive Bayes
 fit_nb <- naiveBayes(loe_morethan6months ~ gender + age_at_survey + opt_score + grit_score, data=df_train)
 predicted_nb <- predict(fit_nb, df_test)
-table(predicted_nb, df_test$loe_morethan6months)
+results_nb <- table(predicted_nb, df_test$loe_morethan6months)
+confusionMatrix(results_nb)
 
-# KNN
+# KNN (useful)
 install.packages("kknn")
 library(kknn)
 library(Metrics)
 fit_knn <- kknn(loe_morethan6months ~ age_at_survey + grit_score + opt_score + grit_score + numearnincome, df_train, df_test, k = 5, kernel = "rectangular", distance = 2)
 predicted_knn <- predict(fit_knn)
-table(predicted_knn, df_test$loe_morethan6months)
+results_knn <- table(predicted_knn, df_test$loe_morethan6months)
+confusionMatrix(results_knn)
 
-# Random Forest
+# Random Forest (useful)
 install.packages("randomForest")
 library(randomForest)
 fit_rf <- randomForest(loe_morethan6months ~ gender + age_at_survey + fin_situ_change + opt_score, df_train, ntree=500)
 predicted_rf <- predict(fit_rf,df_test)
-table(predicted_rf, df_test$loe_morethan6months)
+results_rf <- table(predicted_rf, df_test$loe_morethan6months)
+confusionMatrix(results_rf)
 
 # GBM
 install.packages("gbm")
@@ -220,13 +228,14 @@ xgb <- xgboost(data = data.matrix(X[,-1]),
                label = mat_y,
                eta = 0.025,
                max_depth = 10,
-               nround=100,
+               nround=200,
                objective = "binary:logistic",
                booster = "gbtree",
                subsample = 0.8,
                scale_pos_weight = 0.5,
                colsample_bytree = 1,
-               min_child_weight = 1
+               min_child_weight = 1, 
+               gamma = 0
 )
 
 #Testing the results of our model
