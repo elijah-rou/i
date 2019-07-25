@@ -1,6 +1,6 @@
 install.packages("tidyverse")
 library(tidyverse)
-df_2 <- read.csv("data/processed/dataframe2.csv")
+df_2 <- read.csv("dataframe2.csv")
 
 # Percentage of individuals employed more than 6 months is 0.067
 table(df_2$loe_morethan6months)
