@@ -1,13 +1,14 @@
-install.packages("tidyverse")
+if(!require(tidyverse)) install.packages("tidyverse")
 library(tidyverse)
+if(!require(tidyverse)) install.packages("dplyr")
 library(dplyr)
-df_2 <- read.csv("dataframe2.csv")
+df_2 <- read.csv("data/processed/dataframe2.csv")
 
 # Percentage of individuals employed more than 6 months is 0.067
 table(df_2$loe_morethan6months)
 
 # Section A: Unsupervised ML
-install.packages("cluster")
+if(!require(cluster)) install.packages("cluster")
 library(cluster)
 options(scipen=999)
 
@@ -55,9 +56,9 @@ reg3 <- lm(loe_morethan6months ~ gender*as.factor(h5), data=df_cluster_n)
 summary(reg3)
 
 # Section B: Supervised ML - Decision Tree
-install.packages("caret")
-install.packages("skimr")
-install.packages("RANN")
+if(!require(caret)) install.packages("caret")
+if(!require(skimr)) install.packages("skimr")
+if(!require(RANN)) install.packages("RANN")
 
 library(caret)
 library(skimr)
@@ -68,8 +69,8 @@ df_3 <- df_3 %>% filter(!is.na(volunteer), !is.na(leadershiprole), !is.na(people
 df_3 <- mutate(df_3,
                loe_morethan6months = factor(loe_morethan6months),
                anygrant = factor(anygrant),
-               anyhhincome = factor(anygrant),
-               givemoney_yes = factor(anygrant),
+               anyhhincome = factor(anyhhincome),
+               givemoney_yes = factor(givemoney_yes),
                numchildren = as.numeric(numchildren),
                numearnincome = as.numeric(numearnincome))
 
@@ -92,7 +93,6 @@ trainData <- df_3[trainRowNumbers,]
 testData <- df_3[-trainRowNumbers,]
 
 # Model and Cross Validation
-install.packages("e1071")
 trControl <- trainControl(method = "cv", number=10, verboseIter = TRUE)
 model_rpart <- train(loe_morethan6months ~., data=trainData, method="rpart", trControl=trControl, tuneGrid=expand.grid(cp=seq(0.000,0.02,0.0025)))
 predicted <- predict(model_rpart, testData[,-length(testData)])
@@ -100,7 +100,6 @@ model_rpart$results
 
 # Confusion Matrix
 results_rpart <- table(predicted, testData$loe_morethan6months)
-library(caret)
 confusionMatrix(results_rpart)
 
 # Section C: Logistic Regression, SVM
@@ -131,8 +130,8 @@ predicted_log=predict(logistic,df_test, type="response")
 predicted_log <- ifelse(predicted_log>0.5,1,0)
 table(predicted_log, df_test$loe_morethan6months)
 
-
 # SVM
+if (!require(e1071)) install.packages("e1071")
 library(e1071)
 fit <- svm(loe_morethan6months ~ gender + age_at_survey + fin_situ_change, data=df_train)
 predicted_svm <- predict(fit, df_test)
@@ -146,7 +145,7 @@ results_nb <- table(predicted_nb, df_test$loe_morethan6months)
 confusionMatrix(results_nb)
 
 # KNN (useful)
-install.packages("kknn")
+if (!require(kknn))  install.packages("kknn")
 library(kknn)
 library(Metrics)
 fit_knn <- kknn(loe_morethan6months ~ age_at_survey + grit_score + opt_score + grit_score + numearnincome, df_train, df_test, k = 5, kernel = "rectangular", distance = 2)
@@ -155,7 +154,7 @@ results_knn <- table(predicted_knn, df_test$loe_morethan6months)
 confusionMatrix(results_knn)
 
 # Random Forest (useful)
-install.packages("randomForest")
+if (!require(randomForest)) install.packages("randomForest")
 library(randomForest)
 fit_rf <- randomForest(loe_morethan6months ~ gender + age_at_survey + fin_situ_change + opt_score, df_train, ntree=500)
 predicted_rf <- predict(fit_rf,df_test)
@@ -163,8 +162,7 @@ results_rf <- table(predicted_rf, df_test$loe_morethan6months)
 confusionMatrix(results_rf)
 
 # GBM
-install.packages("gbm")
-library(caret)
+if (!require(gbm)) install.packages("gbm")
 fitControl <- trainControl(method = "repeatedcv", number=4, repeats=4)
 fit_gbm <- train(loe_morethan6months ~ gender + age_at_survey, data=df_train, method="gbm", trControl=fitControl, verbose=FALSE)
 predicted_gbm = predict(fit_gbm, df_test, type="prob")[,2]
@@ -172,15 +170,7 @@ predicted_gbm <- ifelse(predicted_gbm>0.5,1,0)
 table(predicted_gbm, df_test$loe_morethan6months)
 
 # Section D: XGBoost Model
-install.packages("tidyverse")
-install.packages("RANN")
-install.packages("caret")
-install.packages("skimr")
-install.packages("xgboost")
-library(tidyverse)
-library(RANN)
-library(caret)
-library(skimr)
+if (!require(xgboost)) install.packages("xgboost") 
 library(xgboost)
 df_2 <- read.csv("data/processed/dataframe2.csv")
 

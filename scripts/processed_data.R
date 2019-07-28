@@ -1,43 +1,44 @@
-install.packages("tidyverse")
-install.packages("lubridate")
+if (!require(tidyverse)) install.packages("tidyverse")
+if (!require(lubridate)) install.packages("lubridate")
 library(tidyverse)
 library(lubridate)
 
-df <- read.csv("teaching_training_data.csv")
+# Read in the main Harambee data
+df <- read.csv("data/raw/teaching_training_data.csv")
 
 # Calculate age
 df <- df %>%
   mutate(age_at_survey = interval(dob,survey_date_month)/years(1)) %>%
   mutate(age = floor(age_at_survey))
 
-# Financial Situation Change
+# Add Financial Situation Change to the main dataframe
 df <- df %>% 
   mutate(fin_situ_now = parse_number(as.character(financial_situation_now))) %>% 
   mutate(fin_situ_future = parse_number(as.character(financial_situation_5years))) %>% 
   mutate(fin_situ_change = fin_situ_future - fin_situ_now)
 
 # Added in scores
-df_cft <- read.csv("teaching_training_data_cft.csv")
-df_com <- read.csv("teaching_training_data_com.csv")
-df_grit <- read.csv("teaching_training_data_grit.csv")
-df_num <- read.csv("teaching_training_data_num.csv")
-df_opt <- read.csv("teaching_training_data_opt.csv")
+df_cft <- read.csv("data/raw/teaching_training_data_cft.csv")
+df_com <- read.csv("data/raw/teaching_training_data_com.csv")
+df_grit <- read.csv("data/raw/teaching_training_data_grit.csv")
+df_num <- read.csv("data/raw/teaching_training_data_num.csv")
+df_opt <- read.csv("data/raw/teaching_training_data_opt.csv")
 
-df_cft <- df_cft %>% 
-  select(unid, cft_score) %>% 
-  distinct(unid, .keep_all = TRUE)
-
-helper_function <- function(file_name) {
-  file_name %>% 
+# Function to remove duplicate scores from the data
+duplicate_purge <- function(data) {
+    data %>% 
     select(2:3) %>% 
     distinct(unid, .keep_all = TRUE)
 }
 
-df_com <- helper_function(df_com)
-df_grit <- helper_function(df_grit)
-df_num <- helper_function(df_num)
-df_opt <- helper_function(df_opt)
+# Apply to score dataframes
+df_cft <- duplicate_purge(df_cft)
+df_com <- duplicate_purge(df_com)
+df_grit <- duplicate_purge(df_grit)
+df_num <- duplicate_purge(df_num)
+df_opt <- duplicate_purge(df_opt)
 
+# Merge score and main dataframes
 df <- df %>%
   left_join(df_grit, by="unid")%>%
   left_join(df_opt, by="unid")%>%
@@ -45,10 +46,14 @@ df <- df %>%
   left_join(df_com, by ="unid") %>% 
   left_join(df_num, by ="unid")
 
+# Purge the score dataframes from the environment
 rm(df_cft,df_com,df_grit,df_num,df_opt)
 
 # Convert TRUE/FALSE to 1/0 in "Working" column
 df <- mutate(df, working = factor(ifelse(working==TRUE,1,0)))
+
+# Write all data a csv
+write_csv(df, "data/processed/raw_data.csv")
 
 # Use data from first survey only and use distinct individuals only [Model 1 runs on df]
 df <- df %>% filter (survey_num == 1)
