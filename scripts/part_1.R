@@ -11,7 +11,7 @@ if(!require(RANN)) install.packages("RANN")
 library(RANN)
 
 # Read in the processed dataframe
-df <- readRDS(file="data/processed/dataframe1.csv")
+df <- readRDS(file="data/processed/clean_data.RDS")
 
 # Select only relevant data from the columns
 df <- select(df, -c(X, survey_date_month, survey_num, gender, job_start_date, age, job_leave_date, financial_situation_5years, financial_situation_now, fin_situ_future,  peoplelive_15plus, province, dob, company_size, monthly_pay)) %>%
