@@ -11,10 +11,10 @@ if(!require(RANN)) install.packages("RANN")
 library(RANN)
 
 # Read in the processed dataframe
-df <- read.csv("data/processed/dataframe1.csv")
+df <- readRDS(file="data/processed/dataframe1.csv")
 
 # Select only relevant data from the columns
-df <- select(df, -c(X.1, X, survey_date_month, survey_num, gender, job_start_date, age, job_leave_date, financial_situation_5years, financial_situation_now, fin_situ_future,  peoplelive_15plus, province, dob, company_size, monthly_pay)) %>%
+df <- select(df, -c(X, survey_date_month, survey_num, gender, job_start_date, age, job_leave_date, financial_situation_5years, financial_situation_now, fin_situ_future,  peoplelive_15plus, province, dob, company_size, monthly_pay)) %>%
     filter(!is.na(volunteer), !is.na(leadershiprole), !is.na(peoplelive), !is.na(anygrant), !is.na(anyhhincome), !is.na(givemoney_yes)) %>%
     mutate(anygrant = factor(anygrant),
                    anyhhincome = factor(anyhhincome),

@@ -9,10 +9,10 @@ if (!require(Metrics))  install.packages("metrics")
 library(Metrics)
 
 # Read in the source data file
-df <- read.csv("data/processed/dataframe2.csv")
+df <- readRDS(file="data/processed/clean_data.RDS")
 
 # Select the relevant columns and morph into factors where needed
-df <- select(df, -c(X.1, X, survey_date_month, survey_num, working, job_start_date, job_leave_date, financial_situation_now, financial_situation_5years, age, fin_situ_now, fin_situ_future, com_score, num_score, company_size, monthly_pay, length_of_employment, peoplelive_15plus, province, dob))
+df <- select(df, -c(X, survey_date_month, survey_num, working, job_start_date, job_leave_date, financial_situation_now, financial_situation_5years, age, fin_situ_now, fin_situ_future, com_score, num_score, company_size, monthly_pay, length_of_employment, peoplelive_15plus, province, dob))
 df <- df_2 %>% filter(!is.na(volunteer), !is.na(leadershiprole), !is.na(peoplelive), !is.na(anygrant), !is.na(anyhhincome), !is.na(givemoney_yes))
 df <- mutate(df,
                loe_morethan6months = factor(loe_morethan6months),
