@@ -46,3 +46,56 @@ fit <- kknn(loe_morethan6months ~ age_at_survey + grit_score + opt_score + grit_
 predicted <- predict(fit)
 results <- table(predicted, df_test$loe_morethan6months)
 confusionMatrix(results)
+ 
+######################
+# Unsupervised exploration of the data to gain insights
+######################
+df_2 <- read.csv("data/processed/dataframe2.csv")
+
+# Percentage of individuals employed more than 6 months is 0.067
+table(df_2$loe_morethan6months)
+
+options(scipen=999)
+
+df_cluster_n <- df_2 %>%
+  filter(!is.na(age_at_survey) & !is.na(fin_situ_change) & !is.na(grit_score) &!is.na(opt_score))
+
+df_unid <- df_cluster_n %>%
+  select(unid)
+
+df_cluster <- df_cluster_n %>%
+  select(age_at_survey, fin_situ_change, grit_score, opt_score) %>%
+  scale()
+
+set.seed(1234)
+
+# Hierarchical Clustering
+d <- dist(df_cluster, method = "euclidean")
+hc1 <- hclust(d, method = "complete")
+plot(hc1, cex=0.6, hang=-1)
+clusterCut <- cutree(hc1,5)
+table(clusterCut)
+df_cluster_h5 <- bind_cols(as.data.frame(df_cluster), as.data.frame(clusterCut))
+
+df_cluster_h5_sum <- df_cluster_h5 %>%
+  group_by(clusterCut) %>%
+  summarise(age_at_survey = mean(age_at_survey),
+            fin_situ_change = mean(fin_situ_change),
+            grit_score = mean(grit_score),
+            opt_score = mean(opt_score))
+
+h5 <- df_cluster_h5 %>%
+  select(clusterCut) %>%
+  rename(h5 = clusterCut)
+
+df_clusters_unid <- bind_cols(df_unid, h5)
+
+df_cluster_n <- left_join(df_cluster_n, df_clusters_unid, by="unid")
+
+# Regressions
+reg1 <- lm(loe_morethan6months ~ gender, data=df_cluster_n)
+summary(reg1)
+reg2 <- lm(loe_morethan6months ~ anyhhincome, data=df_cluster_n)
+summary(reg2)
+reg3 <- lm(loe_morethan6months ~ gender*as.factor(h5), data=df_cluster_n)
+summary(reg3)
