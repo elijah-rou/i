@@ -7,13 +7,18 @@ if (!require(kknn))  install.packages("kknn")
 library(kknn)
 if (!require(Metrics))  install.packages("metrics")
 library(Metrics)
+if(!require(cluster)) install.packages("cluster")
+library(cluster)
 
 # Read in the source data file
 df <- readRDS(file="data/processed/clean_data.RDS")
 
+##################
+# Supervised learning - predict is likely to be in work after six months
+##################
 # Select the relevant columns and morph into factors where needed
 df <- select(df, -c(X, survey_date_month, survey_num, working, job_start_date, job_leave_date, financial_situation_now, financial_situation_5years, age, fin_situ_now, fin_situ_future, com_score, num_score, company_size, monthly_pay, length_of_employment, peoplelive_15plus, province, dob))
-df <- df_2 %>% filter(!is.na(volunteer), !is.na(leadershiprole), !is.na(peoplelive), !is.na(anygrant), !is.na(anyhhincome), !is.na(givemoney_yes))
+df <- df %>% filter(!is.na(volunteer), !is.na(leadershiprole), !is.na(peoplelive), !is.na(anygrant), !is.na(anyhhincome), !is.na(givemoney_yes))
 df <- mutate(df,
                loe_morethan6months = factor(loe_morethan6months),
                anygrant = factor(anygrant),
@@ -38,6 +43,6 @@ df_test <- anti_join(df, df_train_index)
 
 # Perform KNN algorithm to train the model
 fit <- kknn(loe_morethan6months ~ age_at_survey + grit_score + opt_score + grit_score + numearnincome, df_train, df_test, k = 5, kernel = "rectangular", distance = 2)
-predicted <- predict(fit_knn)
-results <- table(predicted_knn, df_test$loe_morethan6months)
-confusionMatrix(results_knn)
+predicted <- predict(fit)
+results <- table(predicted, df_test$loe_morethan6months)
+confusionMatrix(results)
